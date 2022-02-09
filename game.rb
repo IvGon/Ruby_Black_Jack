@@ -27,6 +27,7 @@ class Game
   def start_game
     puts 'Hello! Welcome to Casino Black jack!'
     user.name = input_str('What is your name?')
+    puts "\nWe start the game. Place your bets gentlemen!"
     play
   end
 
@@ -52,7 +53,7 @@ class Game
   def deal_cards
     user.take_card(deck.deal(2))
     dealer.take_card(deck.deal(2))
-    puts 'Cards Dealt!'
+    puts "\nCards Dealt!"
   end
 
   def game_screen
@@ -92,21 +93,28 @@ class Game
   end
 
   def user_stand
-    user.pass = true
-    puts 'You stand!'
+    if user.pass?
+      puts 'You already missed a turn! Make a different choice!'
+      choice(USER_CHOICE)
+    else
+      user.pass = true
+      puts 'You stand!'
+    end
   end
 
   def user_hit
+    return if user.hand.three_cards?
     user.take_card(deck.deal(1))
     puts 'You taken card!'
   end
 
   def dealer_stand
-    dealer.pass = true
-    puts 'Dealer stand!'
+      dealer.pass = true
+      puts 'Dealer stand!'
   end
 
   def dealer_hit
+    return if dealer.hand.three_cards?
     dealer.take_card(deck.deal(1))
     puts 'Dealer take card!'
   end
@@ -155,7 +163,7 @@ class Game
   end
 
   def dealer_choice
-    if dealer.soft_17?
+    if dealer.soft_17? && dealer.pass? == false
       dealer_stand
     else
       dealer_hit
@@ -248,7 +256,9 @@ class Game
 
   def init_new_round
     @deck = Deck.new
+    user.pass = false
     user.hand = Hand.new
+    dealer.pass = false
     dealer.hand = Hand.new
     @end_of_round = false
   end
